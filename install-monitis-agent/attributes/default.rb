@@ -11,6 +11,8 @@
 default['MONITIS']['INSTALLDIR'] = "/opt/"
 default['MONITIS']['USEREMAIL'] = "EMAIL"
 default['MONITIS']['PASSWORD'] = "PASSWORD"
+default['MONITIS']['APIKEY'] = "APIKEY"
+default['MONITIS']['SECRET'] = "SECRET"
 
 
 default['MONITIS']['AGENTNAME'] = node[:hostname]

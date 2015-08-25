@@ -6,7 +6,7 @@
 # Copyright 2012, Monitis, Inc
 #
 
-if platform?("debian", "ubuntu", "centos", "fedora", "suse", "redhat")
+if platform?("debian", "ubuntu", "centos", "fedora", "suse", "redhat", "amazon")
 
 execute "stop_monitis" do
    cwd "#{node[:MONITIS][:INSTALLDIR]}/monitis"

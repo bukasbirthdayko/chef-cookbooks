@@ -1,4 +1,4 @@
-hostemp=`cat <%= node[:MONITIS][:INSTALLDIR] %>monitis/etc/monitis.conf | grep AGENTNAME | awk '{print $2}'`
+hostemp=`cat <%= node[:MONITIS][:INSTALLDIR] %>/monitis/etc/monitis.conf | grep AGENTNAME | awk '{print $2}'`
 apikey=<%= node[:MONITIS][:APIKEY] %>
 secret=<%= node[:MONITIS][:SECRET] %>
 stamp=`date`

@@ -1,0 +1,42 @@
+hostemp=`cat /opt/monitis/etc/monitis.conf | grep AGENTNAME | awk '{print $2}'`
+apikey=<APIKEY>
+secret=<SECRET>
+stamp=`date`
+auth=`curl "http://api.monitis.com/api?action=authToken&apikey=${apikey}&secretkey=${secret}" | cut -d'"' -f4`
+stamp=`date`
+sleep 3
+
+#DEFAULT DEVICE MONITORS
+
+curl 'http://api.monitis.com/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addCPUMonitor&agentkey=${hostemp}&idleMin=0&ioWaitMax=100&kernelMax=100&niceMax=100&usedMax=100&name=cpu_monitor-${hostemp}&tag=perf"
+
+curl 'http://api.monitis.com/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addMemoryMonitor&agentkey=${hostemp}&name=memory-${hostemp}&tag=perf&Platform=Linux&freeLimit=100&freeSwapLimit=100&&bufferedLimit=16000&cachedLimit=16000"
+
+curl 'http://api.monitis.com/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addLoadAverageMonitor&agentkey=${hostemp}&limit1=8&limit5=8&limit15=8&name=loadaverage-${hostemp}&tag=perf"
+
+curl 'http://api.monitis.com/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&agentkey=${hostemp}&version=3&action=addMonitor&monitorTypeId=6&monitorParams={"interface":"eth0"}&name=bandwidth-${hostemp}&tag=perf"
+
+curl 'http://api.monitis.com/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addDriveMonitor&agentkey=${hostemp}&driveLetter="/"&freeLimit=5&name=rootpartition-${hostemp}&tag=perf"
+
+
+
+
+#ADDITIONAL DRIVES FOR MONGO INSTANCES
+
+echo $hostemp | grep mongo | grep cs > /dev/null
+if [ $? == 0 ]; then
+	curl 'http://api.monitis.com/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addDriveMonitor&agentkey=${hostemp}&driveLetter="/data"&freeLimit=5&name=data-${hostemp}&tag=perf"
+else
+        sleep 2
+fi
+
+echo $hostemp | grep mongo | grep sh > /dev/null
+if [ $? == 0 ]; then
+        curl 'http://api.monitis.com/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addDriveMonitor&agentkey=${hostemp}&driveLetter="/data1"&freeLimit=5&name=data1-${hostemp}&tag=perf"
+        curl 'http://api.monitis.com/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addDriveMonitor&agentkey=${hostemp}&driveLetter="/data2"&freeLimit=5&name=data2-${hostemp}&tag=perf"
+else
+        sleep 2
+fi
+
+
+

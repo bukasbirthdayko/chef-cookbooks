@@ -11,6 +11,8 @@
 default['MONITIS']['INSTALLDIR'] = "/tmp/"
 default['MONITIS']['USEREMAIL'] = "EMAIL"
 default['MONITIS']['PASSWORD'] = "MD5PASSWORD"
+default['MONITIS']['APIKEY'] = "APIKEY"
+default['MONITIS']['SECRET'] = "SECRETKEY"
 
 default['MONITIS']['AGENTNAME'] = node[:hostname]
 default['MONITIS']['TARBALL_32'] = "monitorus-agent-linux-32bit.tar.gz"

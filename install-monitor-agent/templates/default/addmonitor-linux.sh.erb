@@ -1,41 +1,34 @@
-hostemp=`cat /tmp/monitis/etc/monitis.conf | grep AGENTNAME | awk '{print $2}'`
-apikey=<APIKEY>
-secret=<SECRET>
+hostemp=`cat <%= node[:MONITIS][:INSTALLDIR] %>/monitis/etc/monitis.conf | grep AGENTNAME | awk '{print $2}'`
+apikey=<%= node[:MONITIS][:APIKEY] %>
+secret=<%= node[:MONITIS][:SECRET] %>
 stamp=`date`
 auth=`curl "http://monitor.us/api?action=authToken&apikey=${apikey}&secretkey=${secret}" | cut -d'"' -f4`
 stamp=`date`
 sleep 3
 
+
+
+#OPTIONAL MONITOR TAGGING
+
+#echo $hostemp | grep "production" > /dev/null
+#if [ $? == 0 ]; then
+#        grouptag=production
+#fi
+
+grouptag=DEVICE
+
+
 #DEFAULT DEVICE MONITORS
 
-curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addCPUMonitor&agentkey=${hostemp}&idleMin=0&ioWaitMax=100&kernelMax=100&niceMax=100&usedMax=100&name=cpu_monitor-${hostemp}&tag=perf"
+curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addCPUMonitor&agentkey=${hostemp}&idleMin=0&ioWaitMax=85&kernelMax=85&niceMax=85&usedMax=85&name=${hostemp}-CPU&tag=${grouptag}-CPU"
 
-curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addMemoryMonitor&agentkey=${hostemp}&name=memory-${hostemp}&tag=perf&Platform=Linux&freeLimit=100&freeSwapLimit=100&&bufferedLimit=16000&cachedLimit=16000"
+curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addMemoryMonitor&agentkey=${hostemp}&name=${hostemp}-MEM&tag=${grouptag}-MEM&Platform=Linux&freeLimit=512&freeSwapLimit=100&&bufferedLimit=16000&cachedLimit=16000"
 
-curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addLoadAverageMonitor&agentkey=${hostemp}&limit1=8&limit5=8&limit15=8&name=loadaverage-${hostemp}&tag=perf"
+curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addLoadAverageMonitor&agentkey=${hostemp}&limit1=8&limit5=8&limit15=8&name=${hostemp}-LOAD&tag=${grouptag}-LOAD"
 
-curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&agentkey=${hostemp}&version=3&action=addMonitor&monitorTypeId=6&monitorParams={"interface":"eth0"}&name=bandwidth-${hostemp}&tag=perf"
+curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&agentkey=${hostemp}&version=3&action=addMonitor&monitorTypeId=6&monitorParams={"interface":"eth0"}&name=${hostemp}-BW&tag=${grouptag}-BANDWIDTH"
 
-curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addDriveMonitor&agentkey=${hostemp}&driveLetter="/"&freeLimit=5&name=rootpartition-${hostemp}&tag=perf"
+curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addDriveMonitor&agentkey=${hostemp}&driveLetter="/"&freeLimit=5&name=${hostemp}-DISK-Root&tag=${grouptag}-DISKSpace"
 
-
-
-
-#ADDITIONAL DRIVES FOR MONGO INSTANCES
-
-echo $hostemp | grep mongo | grep cs > /dev/null
-if [ $? == 0 ]; then
-	curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addDriveMonitor&agentkey=${hostemp}&driveLetter="/data"&freeLimit=5&name=data-${hostemp}&tag=perf"
-else
-        sleep 2
-fi
-
-echo $hostemp | grep mongo | grep sh > /dev/null
-if [ $? == 0 ]; then
-        curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addDriveMonitor&agentkey=${hostemp}&driveLetter="/data1"&freeLimit=5&name=data1-${hostemp}&tag=perf"
-        curl 'http://monitor.us/api' --data "apikey=${apikey}&validation=token&authToken=${auth}&timestamp=${stamp}&version=2&action=addDriveMonitor&agentkey=${hostemp}&driveLetter="/data2"&freeLimit=5&name=data2-${hostemp}&tag=perf"
-else
-        sleep 2
-fi
 
 
